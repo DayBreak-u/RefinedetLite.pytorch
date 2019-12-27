@@ -7,6 +7,7 @@ from data import voc_refinedet, coco_refinedet
 import os
 
 from .Snet import snet
+from .Res2NetLite72 import Res2NetLite
 from .modules import  conv_bn,Bottleneck,gropy_conv_bn,InvertedResidual
 
 class RefineDet(nn.Module):
@@ -308,12 +309,14 @@ def build_refinedet(phase, size=320, num_classes=21):
     cfg = (coco_refinedet, voc_refinedet)[num_classes == 21]
     mbox = cfg["mbox"]  # number of boxes per feature map location
 
-    tcb = [264, 528, 512, 512]
+    # tcb = [264, 528, 512, 512]
+    tcb = [576, 1152, 512, 512]
 
 
-    base_ = snet(146)
+    # base_ = snet(146)
+    base_ = Res2NetLite()
 
-    extras_ = [Bottleneck(528, 512), Bottleneck(512, 512)]
+    extras_ = [Bottleneck(1152, 512), Bottleneck(512, 512)]
 
     ARM_ = arm_multibox( extras_, mbox , tcb)
     ODM_ = odm_multibox( extras_, mbox, num_classes)
